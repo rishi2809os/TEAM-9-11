@@ -596,6 +596,93 @@
     }
     footer p em { color: var(--orange); font-style: normal; }
 
+    /* ── BUZZWORD GENERATOR ── */
+    .buzzword-section {
+      background: #050505;
+      border-top: 1px solid #111;
+      border-bottom: 1px solid #111;
+      padding: 6rem 3rem;
+      text-align: center;
+    }
+    .buzzword-output-wrap {
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2.5rem auto;
+      max-width: 860px;
+      position: relative;
+    }
+    .buzzword-output {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 6vw, 4.2rem);
+      color: var(--acid);
+      letter-spacing: 0.04em;
+      line-height: 1.05;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(16px) scale(0.96);
+      transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      word-break: break-word;
+    }
+    .buzzword-output.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .buzzword-output .bw-word {
+      display: inline-block;
+      padding: 0 0.15em;
+    }
+    .buzzword-output .bw-word:nth-child(odd) { color: var(--white); }
+    .buzzword-output .bw-word:nth-child(even) { color: var(--acid); }
+    .buzzword-output .bw-word:last-child { color: var(--orange); }
+    .buzzword-placeholder {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.9rem;
+      color: #333;
+      letter-spacing: 0.1em;
+    }
+    .btn-buzzword {
+      background: transparent;
+      border: 2px solid var(--acid);
+      color: var(--acid);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 1rem 3rem;
+      cursor: pointer;
+      clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-buzzword::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--acid);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.25s ease;
+      z-index: 0;
+    }
+    .btn-buzzword:hover::before { transform: scaleX(1); }
+    .btn-buzzword:hover { color: var(--black); }
+    .btn-buzzword span { position: relative; z-index: 1; }
+    .btn-buzzword.spin span::before { content: '⚙ '; animation: spinIcon 0.5s linear; }
+    @keyframes spinIcon { from { display:inline-block; transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .buzzword-counter {
+      font-size: 0.7rem;
+      color: #444;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-top: 1.5rem;
+      font-family: 'Courier Prime', monospace;
+    }
+    .buzzword-counter em { color: var(--orange); font-style: normal; }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
       nav ul { display: none; }
@@ -656,6 +743,30 @@
     <span>Synergy Maximized</span><span>Blockchain Activated</span><span>AI Thinking</span>
     <span>Disruption In Progress</span><span>Web3 Loading</span><span>Toasters Online</span>
     <span>Pivoting To Quantum</span><span>VC Funds Secured</span><span>Metaverse Ready</span>
+  </div>
+</div>
+
+<!-- BUZZWORD GENERATOR -->
+<div class="buzzword-section">
+  <p class="section-label" style="text-align:center; display:block;">🚀 Our Newest Revolutionary Feature!</p>
+  <h2 style="font-family:'Bebas Neue',sans-serif; font-size:clamp(2.5rem,6vw,5rem); line-height:0.9; margin-top:0.5rem;">
+    Generate Your<br><span style="color:var(--acid)">Billion-Dollar Buzzword</span>
+  </h2>
+  <p style="color:#666; font-family:'Courier Prime',monospace; font-size:0.9rem; margin-top:1rem; max-width:480px; margin-left:auto; margin-right:auto; line-height:1.8;">
+    Instantly synthesize a world-class startup pitch using our proprietary Semantic Disruption Algorithm™.
+  </p>
+
+  <div class="buzzword-output-wrap">
+    <div class="buzzword-output" id="buzzword-output">
+      <span class="buzzword-placeholder">← Click the button to generate →</span>
+    </div>
+  </div>
+
+  <button class="btn-buzzword" id="buzz-btn" onclick="generateBuzzword()">
+    <span id="buzz-btn-text">⚡ Generate Buzzword</span>
+  </button>
+  <div class="buzzword-counter" id="buzz-counter" style="display:none;">
+    Buzzwords Generated: <em id="buzz-count">0</em> &nbsp;·&nbsp; Funding Raised: <em>$0</em>
   </div>
 </div>
 
@@ -899,6 +1010,54 @@
     if (e.target === document.getElementById('modal-overlay')) closeModal();
   }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // Buzzword Generator
+  const buzzWords = {
+    prefix: ["AI-Powered","Quantum","Blockchain-Enhanced","Metaverse-Ready","Neural","Decentralized",
+      "Cloud-Native","Edge-Enabled","Hyper-Automated","Web3","Deep-Learning","Zero-Trust",
+      "Tokenized","Autonomous","Serverless","Omnichannel","Real-Time","Next-Gen","Crypto-Backed","Semantic"],
+    middle: ["SaaS","B2B","DAO","NFT","IoT","API","DevOps","No-Code","Low-Code","Agile",
+      "Lean","Platform","Ecosystem","Marketplace","Infrastructure","Analytics","Microservices",
+      "Data-Driven","Synergy","Disruption","Vertical","Omnistack","Scalability","Intelligence"],
+    suffix: ["Engine","Framework","Protocol","Solution","Optimizer","Accelerator","Orchestrator",
+      "Transformer","Disruptor","Generator","Matrix","Paradigm","Nexus","Ecosystem","Pipeline",
+      "Stack","Launchpad","Velocity","Catalyst","Hub","Layer","Architecture","Intelligence","OS"]
+  };
+  let buzzCount = 0;
+  let lastBuzz = '';
+
+  function generateBuzzword() {
+    const btn = document.getElementById('buzz-btn');
+    const btnText = document.getElementById('buzz-btn-text');
+    const output = document.getElementById('buzzword-output');
+    const counter = document.getElementById('buzz-counter');
+
+    // Spinning feedback
+    btnText.textContent = '⚙ Synthesizing...';
+    btn.disabled = true;
+    output.classList.remove('show');
+
+    setTimeout(() => {
+      let phrase = '';
+      do {
+        const p = buzzWords.prefix[Math.floor(Math.random() * buzzWords.prefix.length)];
+        const m = buzzWords.middle[Math.floor(Math.random() * buzzWords.middle.length)];
+        const s = buzzWords.suffix[Math.floor(Math.random() * buzzWords.suffix.length)];
+        phrase = `${p} ${m} ${s}`;
+      } while (phrase === lastBuzz);
+      lastBuzz = phrase;
+
+      const words = phrase.split(' ');
+      output.innerHTML = words.map(w => `<span class="bw-word">${w}</span>`).join(' ');
+      output.classList.add('show');
+
+      buzzCount++;
+      document.getElementById('buzz-count').textContent = buzzCount;
+      counter.style.display = 'block';
+      btnText.textContent = '⚡ Generate Another';
+      btn.disabled = false;
+    }, 600);
+  }
 
   // Scroll reveal
   const observer = new IntersectionObserver((entries) => {
